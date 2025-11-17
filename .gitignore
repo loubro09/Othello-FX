@@ -281,3 +281,7 @@ $RECYCLE.BIN/
 config.properties
 
 out/production/Othello-FX/com/eudycontreras/othello/views/application.css
+.idea/dbnavigator.xml
+.idea/Othello-FX.iml
+out/production/Othello-FX/com/eudycontreras/othello/application/application.css
+out/production/Othello-FX/com/eudycontreras/othello/views/application.css
