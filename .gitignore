@@ -36,6 +36,7 @@ replay_pid*
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.idea/Othello-FX.iml
 
 # AWS User-specific
 .idea/**/aws.xml
@@ -51,6 +52,7 @@ replay_pid*
 .idea/**/dynamic.xml
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
+.idea/dbnavigator.xml
 
 # Gradle
 .idea/**/gradle.xml
@@ -277,3 +279,5 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/java,windows,macos,jetbrains+all,maven,intellij+all
 config.properties
+
+out/production/Othello-FX/com/eudycontreras/othello/views/application.css
