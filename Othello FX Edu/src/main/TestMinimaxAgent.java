@@ -12,9 +12,8 @@ import com.eudycontreras.othello.utilities.GameTreeUtility;
 import java.util.List;
 
 public class TestMinimaxAgent extends Agent {
-
-    private int maxDepth = 5;          // maximum depth for cutoff
-    private long maxTimeMillis = 5000; // max 5 seconds per move
+    private int maxDepth = 5; //maximum depth for search before cutoff
+    private long maxTimeMillis = 5000; //maximum time for AI to make move
 
     public TestMinimaxAgent(String name) {
         super(name, PlayerTurn.PLAYER_ONE);
@@ -25,44 +24,75 @@ public class TestMinimaxAgent extends Agent {
     }
 
     @Override
-    public AgentMove getMove(GameBoardState gameState) {
-        long startTime = System.currentTimeMillis();
-        resetCounters();
+    public AgentMove getMove(GameBoardState state) {
+        long startTime = System.currentTimeMillis(); //start counter for max time
+        resetCounters(); //reset tree values
 
-        MoveWrapper bestMove = null;
-        double bestValue = Double.NEGATIVE_INFINITY;
+        ObjectiveWrapper bestMove = null; //keeps best move so far
+        double bestValue = Double.NEGATIVE_INFINITY; //initial value for best value is the lowest possible
 
-        List<ObjectiveWrapper> moves = AgentController.getAvailableMoves(gameState, playerTurn);
+        List<ObjectiveWrapper> moves = AgentController.getAvailableMoves(state, playerTurn); //gets all possible moves for current player
 
-        // Sort moves by path length (largest first)
-        moves.sort((m1, m2) -> Integer.compare(m2.getPath().size(), m1.getPath().size()));
+        if(moves.isEmpty()){
+            return null;
+        }
 
-        for (ObjectiveWrapper move : moves) {
-            if (move == null) continue; // safety check
-            GameBoardState childState = AgentController.getNewState(gameState, move);
-            double value = alphaBeta(childState, maxDepth - 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, false, startTime);
+        for (ObjectiveWrapper move : moves) { //loops through all moves
+            if (move == null) continue;
+
+            GameBoardState childState = AgentController.getNewState(state, move); //creates new board based on the current move
+
+            //uses alpha-beta pruning to evaluate move
+            double value = alphaBeta(
+                    childState, //new board
+                    maxDepth - 1, //decreases depth with 1 for next move
+                    Double.NEGATIVE_INFINITY, //alpha start-value
+                    Double.POSITIVE_INFINITY, //beta start-value
+                    false, //opponent (minimizing) player has next move
+                    startTime //timer to check if max time has been reached
+            );
+
+            //checks if the value from the alpha-beta pruning is better than the saved value
             if (value > bestValue) {
-                bestValue = value;
-                bestMove = new MoveWrapper(move); // wrap ObjectiveWrapper in MoveWrapper
+                bestValue = value; //updates the best value if the new value is greater
+                bestMove = move; //updates the best move with the current move
             }
         }
 
-        System.out.println("Search Depth: " + maxDepth);
-        System.out.println("Nodes Examined: " + nodesExamined);
-        System.out.println("Board Evaluation: " + bestValue);
+        //prints the status of the board after the move has been made
+        if(bestMove != null) {
+            GameBoardState newState = AgentController.getNewState(state, bestMove);
+            System.out.println("Board after the best move:");
+            System.out.println(newState);
+        }
 
-        return bestMove;
+        System.out.println("Search Depth: " + maxDepth); //prints the depth of the search
+        System.out.println("Nodes Examined: " + nodesExamined); //prints number of nodes examined
+
+        return new MoveWrapper(bestMove); //returns best move (performs it on the board)
     }
+
+    /**
+     *
+     * @param state The current board configuration.
+     * @param depth How many moves ahead to explore.
+     * @param alpha The best value found so far for the maximizer (upper bound for the min).
+     * @param beta The best value found so far for the minimizer (lower bound for the max).
+     * @param maximizingPlayer If it's your agent's turn, or the opponent.
+     * @param startTime Used to stop the search if it exceeds the time limit.
+     * @return
+     */
 
 
     private double alphaBeta(GameBoardState state, int depth, double alpha, double beta, boolean maximizingPlayer, long startTime) {
-        nodesExamined++;
+        nodesExamined++; //Counts how many nodes we have evaluated
 
-        // Cutoff if depth is 0, time exceeded, or terminal node
+        // Cutoff if depth is 0, time exceeded, or the game is over
         if (depth == 0 || AgentController.isTerminal(state, playerTurn) || (System.currentTimeMillis() - startTime) > maxTimeMillis) {
             return AgentController.heuristicEvaluation(state, HeuristicType.DYNAMIC, playerTurn);
         }
 
+        //Generate all legal moves for the current player
         List<ObjectiveWrapper> moves = AgentController.getAvailableMoves(
                 state,
                 maximizingPlayer ? playerTurn : GameTreeUtility.getCounterPlayer(playerTurn)
