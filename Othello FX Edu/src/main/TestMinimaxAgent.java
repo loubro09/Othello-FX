@@ -72,6 +72,12 @@ public class TestMinimaxAgent extends Agent {
         return new MoveWrapper(bestMove); //returns best move (performs it on the board)
     }
 
+    //TODO: add ++ to counters:
+    //		searchDepth
+    //		reachedLeafNodes
+    //		nodesExamined
+    //		prunedCounter
+    //	}
     /**
      *
      * @param state The current board configuration.
