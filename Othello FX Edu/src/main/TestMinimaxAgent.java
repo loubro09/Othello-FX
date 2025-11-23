@@ -105,23 +105,24 @@ public class TestMinimaxAgent extends Agent {
         );
 
         if (maximizingPlayer) {
-            double value = Double.NEGATIVE_INFINITY;
-            for (ObjectiveWrapper move : moves) {
-                if (move == null) continue;
-                GameBoardState child = AgentController.getNewState(state, move);
-                value = Math.max(value, alphaBeta(child, depth - 1, alpha, beta, false, startTime));
-                alpha = Math.max(alpha, value);
-                if (alpha >= beta) break; // beta cutoff
+            double value = Double.NEGATIVE_INFINITY; //Start with negative infinity because we want to maximize.
+            for (ObjectiveWrapper move : moves) { //For each possible move
+                if (move == null) continue; // Prevent null problems if there are any nulls in the list of possible moves.
+                GameBoardState child = AgentController.getNewState(state, move); // Create a new board to simulate the results of the move
+                value = Math.max(value, alphaBeta(child, depth - 1, alpha, beta, false, startTime)); //Call alphaBeta recursively to evaluate the move on the new board
+                alpha = Math.max(alpha, value); //update the best guaranteed value for the maximizer.
+                if (alpha >= beta) break; // if alpha >= beta, prune the rest of the moves.
             }
             return value;
         } else {
-            double value = Double.POSITIVE_INFINITY;
+            //Simulate what the opponent would do to hurt the ai score.
+            double value = Double.POSITIVE_INFINITY; //Start with positive infinity because we want to minimize.
             for (ObjectiveWrapper move : moves) {
                 if (move == null) continue;
-                GameBoardState child = AgentController.getNewState(state, move);
-                value = Math.min(value, alphaBeta(child, depth - 1, alpha, beta, true, startTime));
-                beta = Math.min(beta, value);
-                if (beta <= alpha) break; // alpha cutoff
+                GameBoardState child = AgentController.getNewState(state, move); // Create a new board to simulate the results of the move
+                value = Math.min(value, alphaBeta(child, depth - 1, alpha, beta, true, startTime)); //Call alphaBeta recursively to evaluate the move on the new board
+                beta = Math.min(beta, value); //update the best guaranteed value for the minimizer.
+                if (beta <= alpha) break; // if beta <= alpha, prune the rest of the moves.
             }
             return value;
         }
