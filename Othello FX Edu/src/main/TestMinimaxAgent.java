@@ -66,7 +66,7 @@ public class TestMinimaxAgent extends Agent {
             System.out.println(newState);
         }
 
-        System.out.println("Search Depth: " + maxDepth); //prints the depth of the search
+        System.out.println("Search Depth: " + searchDepth); //prints the depth of the search
         System.out.println("Nodes Examined: " + nodesExamined); //prints number of nodes examined
 
         return new MoveWrapper(bestMove); //returns best move (performs it on the board)
@@ -88,20 +88,18 @@ public class TestMinimaxAgent extends Agent {
      * @param startTime Used to stop the search if it exceeds the time limit.
      * @return
      */
-
-
     private double alphaBeta(GameBoardState state, int depth, double alpha, double beta, boolean maximizingPlayer, long startTime) {
         nodesExamined++; //Counts how many nodes we have evaluated
 
-        // Cutoff if depth is 0, time exceeded, or the game is over
+        //Cutoff if depth is 0, time exceeded, or the game is over
         if (depth == 0 || AgentController.isTerminal(state, playerTurn) || (System.currentTimeMillis() - startTime) > maxTimeMillis) {
-            return AgentController.heuristicEvaluation(state, HeuristicType.DYNAMIC, playerTurn);
+            return AgentController.heuristicEvaluation(state, HeuristicType.DIFFERENTIATION, playerTurn);
         }
 
         //Generate all legal moves for the current player
         List<ObjectiveWrapper> moves = AgentController.getAvailableMoves(
-                state,
-                maximizingPlayer ? playerTurn : GameTreeUtility.getCounterPlayer(playerTurn)
+            state,
+            maximizingPlayer ? playerTurn : GameTreeUtility.getCounterPlayer(playerTurn)
         );
 
         if (maximizingPlayer) {
