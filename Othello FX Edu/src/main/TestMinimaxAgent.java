@@ -72,12 +72,6 @@ public class TestMinimaxAgent extends Agent {
         return new MoveWrapper(bestMove); //returns best move (performs it on the board)
     }
 
-    //TODO: add ++ to counters:
-    //		searchDepth
-    //		reachedLeafNodes
-    //		nodesExamined
-    //		prunedCounter
-    //	}
     /**
      *
      * @param state The current board configuration.
@@ -91,8 +85,11 @@ public class TestMinimaxAgent extends Agent {
     private double alphaBeta(GameBoardState state, int depth, double alpha, double beta, boolean maximizingPlayer, long startTime) {
         nodesExamined++; //Counts how many nodes we have evaluated
 
+        searchDepth = Math.max(searchDepth, (maxDepth - depth));
+
         //Cutoff if depth is 0, time exceeded, or the game is over
         if (depth == 0 || AgentController.isTerminal(state, playerTurn) || (System.currentTimeMillis() - startTime) > maxTimeMillis) {
+            reachedLeafNodes++;
             return AgentController.heuristicEvaluation(state, HeuristicType.DIFFERENTIATION, playerTurn);
         }
 
@@ -109,7 +106,10 @@ public class TestMinimaxAgent extends Agent {
                 GameBoardState child = AgentController.getNewState(state, move); // Create a new board to simulate the results of the move
                 value = Math.max(value, alphaBeta(child, depth - 1, alpha, beta, false, startTime)); //Call alphaBeta recursively to evaluate the move on the new board
                 alpha = Math.max(alpha, value); //update the best guaranteed value for the maximizer.
-                if (alpha >= beta) break; // if alpha >= beta, prune the rest of the moves.
+                if (alpha >= beta) {
+                    prunedCounter++;
+                    break; // if alpha >= beta, prune the rest of the moves.
+                }
             }
             return value;
         } else {
@@ -120,7 +120,10 @@ public class TestMinimaxAgent extends Agent {
                 GameBoardState child = AgentController.getNewState(state, move); // Create a new board to simulate the results of the move
                 value = Math.min(value, alphaBeta(child, depth - 1, alpha, beta, true, startTime)); //Call alphaBeta recursively to evaluate the move on the new board
                 beta = Math.min(beta, value); //update the best guaranteed value for the minimizer.
-                if (beta <= alpha) break; // if beta <= alpha, prune the rest of the moves.
+                if (beta <= alpha) {
+                    prunedCounter++;
+                    break; // if beta <= alpha, prune the rest of the moves.
+                }
             }
             return value;
         }
